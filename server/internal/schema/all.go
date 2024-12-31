@@ -1,3 +1,5 @@
+// temporary file to hold all the schema structs, will be moved to individual files later
+
 package schema
 
 import "gorm.io/gorm"
@@ -5,19 +7,34 @@ import "gorm.io/gorm"
 type User struct {
 	gorm.Model
 
-	Name         string `json:"name"`
+	Username     string `json:"username"`
 	Email        string `json:"email"`
-	PasswordHash string `json:"passwordHash"`
+	PasswordHash string `json:"-"`
+	Points       int    `json:"points"`
 
-	Discussions      []Discussion     `json:"discussions" gorm:"foreignKey:UserID"`
-	DiscusionReplies []DiscusionReply `json:"discusionReplies" gorm:"foreignKey:UserID"`
-	Notes            []Note           `json:"notes" gorm:"foreignKey:UserID"`
-	NoteReplies      []NoteReply      `json:"noteReplies" gorm:"foreignKey:UserID"`
-	Content          []Content        `json:"posts" gorm:"foreignKey:UserID"`
+	Discussions      []Discussion     `json:"discussions" gorm:"foreignKey:UserID"`      // all discussions the user owns
+	DiscusionReplies []DiscusionReply `json:"discusionReplies" gorm:"foreignKey:UserID"` // all replies the user has made
+	Notes            []Note           `json:"notes" gorm:"foreignKey:UserID"`            // all notes the user owns
+	NoteReplies      []NoteReply      `json:"noteReplies" gorm:"foreignKey:UserID"`      // all replies the user has made
+
+	/*
+		*Content field contains all the content the user owns.
+		To Fetch all relationships on a user's content:
+			1. Fetch all content the user owns
+			2. Preload all discussions, notes, and their replies
+		Example:
+		```
+		db.Preload("Content.Discussions.Replies"). Preload("Content.Notes.Replies"). Where("id = ?", userID). Find(&user)
+		```
+	*/
+	Content []Content `json:"posts" gorm:"foreignKey:UserID"`
 }
 
 type Discussion struct {
 	gorm.Model
+	UserID uint  `json:"userId"`
+	User   *User `json:"user" gorm:"foreignKey:UserID"`
+
 	ContentID uint     `json:"contentId"`
 	Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
 
@@ -26,6 +43,8 @@ type Discussion struct {
 
 type DiscusionReply struct {
 	gorm.Model
+	UserID uint  `json:"userId"`
+	User   *User `json:"user" gorm:"foreignKey:UserID"`
 
 	DiscussionID uint        `json:"discussionId"`
 	Discussion   *Discussion `json:"discussion" gorm:"foreignKey:DiscussionID"`
@@ -36,6 +55,9 @@ type DiscusionReply struct {
 
 type Note struct {
 	gorm.Model
+	UserID uint  `json:"userId"`
+	User   *User `json:"user" gorm:"foreignKey:UserID"`
+
 	ContentID uint     `json:"contentId"`
 	Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
 
@@ -44,6 +66,8 @@ type Note struct {
 
 type NoteReply struct {
 	gorm.Model
+	UserID uint  `json:"userId"`
+	User   *User `json:"user" gorm:"foreignKey:UserID"`
 
 	NoteID uint  `json:"noteId"`
 	Note   *Note `json:"note" gorm:"foreignKey:NoteID"`
@@ -58,12 +82,14 @@ type Content struct {
 	Title  string `json:"title"`
 	Body   string `json:"body"`
 	UserID uint   `json:"userId"`
-	Type   string `json:"type"` //forumContent, note, etc.
 
 	// optional
-	User        *User        `json:"user" gorm:"foreignKey:UserID"`
-	Discussions []Discussion `json:"discussions" gorm:"foreignKey:ContentID"`
-	Notes       []Note       `json:"notes" gorm:"foreignKey:ContentID"`
+	User           *User            `json:"user" gorm:"foreignKey:UserID"`
+	Discussions    []Discussion     `json:"discussions" gorm:"foreignKey:ContentID"`
+	DiscusionReply []DiscusionReply `json:"discusionReply" gorm:"foreignKey:ContentID"`
+	Notes          []Note           `json:"notes" gorm:"foreignKey:ContentID"`
+	NoteReplies    []NoteReply      `json:"noteReplies" gorm:"foreignKey:ContentID"`
+	Tags           []Tag            `json:"tags" gorm:"many2many:content_tags"`
 }
 
 type ContentTag struct {
