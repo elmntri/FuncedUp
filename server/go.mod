@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/go-playground/validator/v10 v10.23.0
+	github.com/google/uuid v1.4.0
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/spf13/viper v1.19.0
 	go.uber.org/fx v1.23.0

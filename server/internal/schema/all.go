@@ -1,111 +1,105 @@
 package schema
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type BaseModel struct {
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	// DeletedAt int  `json:"deletedAt" gorm:"index"`
+}
 
 type User struct {
-	gorm.Model
+	BaseModel
 
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	PasswordHash string `json:"-"`
 	Points       int    `json:"points"`
 
-	Discussions      []Discussion     `json:"discussions" gorm:"foreignKey:OwnerID"`      // all discussions the user owns
-	DiscusionReplies []DiscusionReply `json:"discusionReplies" gorm:"foreignKey:OwnerID"` // all replies the user has made
-	Notes            []Note           `json:"notes" gorm:"foreignKey:OwnerID"`            // all notes the user owns
-	NoteReplies      []NoteReply      `json:"noteReplies" gorm:"foreignKey:OwnerID"`      // all replies the user has made
-
-	/*
-	 * Content field contains all the content the user owns.
-	 * To Fetch all relationships on a user's content:
-	 *   1. Fetch all content the user owns
-	 *   2. Preload all discussions, notes, and their replies
-	 *
-	 * Example:
-	 *	db.Preload("Content.Discussions.Replies").
-	 *   	  Preload("Content.Notes.Replies").
-	 *   	  Where("id = ?", userID).
-	 *   	  Find(&user)
-	 */
-	Content []Content `json:"posts" gorm:"foreignKey:OwnerID"`
+	// Discussions      []Discussion     `json:"discussions" gorm:"foreignKey:OwnerID"`      // all discussions the user owns
+	// DiscusionReplies []DiscusionReply `json:"discusionReplies" gorm:"foreignKey:OwnerID"` // all replies the user has made
+	// Notes            []Note           `json:"notes" gorm:"foreignKey:OwnerID"`            // all notes the user owns
+	// NoteReplies      []NoteReply      `json:"noteReplies" gorm:"foreignKey:OwnerID"`      // all replies the user has made
+	// Content []Content `json:"posts" gorm:"foreignKey:OwnerID"`
 }
 
 type Discussion struct {
-	gorm.Model
+	BaseModel
 
-	OwnerID uint  `json:"ownerId"`
-	Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
+	OwnerID   uint `json:"ownerId"`
+	ContentID uint `json:"contentId"`
 
-	ContentID uint     `json:"contentId"`
-	Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
-
-	Replies []DiscusionReply `json:"replies" gorm:"foreignKey:DiscussionID"`
+	// Owner   *User            `json:"owner" gorm:"foreignKey:OwnerID"`
+	// Content *Content         `json:"content" gorm:"foreignKey:ContentID"`
+	// Replies []DiscusionReply `json:"replies" gorm:"foreignKey:DiscussionID"`
 }
 
 type DiscusionReply struct {
-	gorm.Model
+	BaseModel
 
-	OwnerID uint  `json:"ownerId"`
-	Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
+	OwnerID      uint `json:"ownerId"`
+	DiscussionID uint `json:"discussionId"`
+	ContentID    uint `json:"contentId"`
 
-	DiscussionID uint        `json:"discussionId"`
-	Discussion   *Discussion `json:"discussion" gorm:"foreignKey:DiscussionID"`
-
-	ContentID uint     `json:"contentId"`
-	Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
+	// Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
+	// Discussion   *Discussion `json:"discussion" gorm:"foreignKey:DiscussionID"`
+	// Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
 }
 
 type Note struct {
-	gorm.Model
+	BaseModel
 
-	OwnerID uint  `json:"ownerId"`
-	Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
+	OwnerID   uint `json:"ownerId"`
+	ContentID uint `json:"contentId"`
 
-	ContentID uint     `json:"contentId"`
-	Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
-
-	Replies []NoteReply `json:"replies" gorm:"foreignKey:NoteID"`
+	// Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
+	// Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
+	// Replies []NoteReply `json:"replies" gorm:"foreignKey:NoteID"`
 }
 
 type NoteReply struct {
-	gorm.Model
+	BaseModel
 
-	OwnerID uint  `json:"ownerId"`
-	Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
+	OwnerID   uint `json:"ownerId"`
+	NoteID    uint `json:"noteId"`
+	ContentID uint `json:"contentId"`
 
-	NoteID uint  `json:"noteId"`
-	Note   *Note `json:"note" gorm:"foreignKey:NoteID"`
-
-	ContentID uint     `json:"contentId"`
-	Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
+	// Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
+	// Note   *Note `json:"note" gorm:"foreignKey:NoteID"`
+	// Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
 }
 
 type Content struct {
-	gorm.Model
+	BaseModel
 
 	Title   string `json:"title"`
 	Body    string `json:"body"`
 	OwnerID uint   `json:"ownerId"`
 
 	// optional
-	Owner          *User            `json:"owner" gorm:"foreignKey:OwnerID"`
-	Discussions    []Discussion     `json:"discussions" gorm:"foreignKey:ContentID"`
-	DiscusionReply []DiscusionReply `json:"discusionReply" gorm:"foreignKey:ContentID"`
-	Notes          []Note           `json:"notes" gorm:"foreignKey:ContentID"`
-	NoteReplies    []NoteReply      `json:"noteReplies" gorm:"foreignKey:ContentID"`
+	// Owner          *User            `json:"owner" gorm:"foreignKey:OwnerID"`
+	// Discussions    []Discussion     `json:"discussions" gorm:"foreignKey:ContentID"`
+	// DiscusionReply []DiscusionReply `json:"discusionReply" gorm:"foreignKey:ContentID"`
+	// Notes          []Note           `json:"notes" gorm:"foreignKey:ContentID"`
+	// NoteReplies    []NoteReply      `json:"noteReplies" gorm:"foreignKey:ContentID"`
 
 	Tags []Tag `json:"tags" gorm:"many2many:content_tags"`
 }
 
 type ContentTag struct {
-	gorm.Model
+	BaseModel
 	ContentID    uint   `json:"contentId"`
 	TagID        uint   `json:"tagId"`
 	Relationship string `json:"relationship"` // potentially use enums for relationships
 }
 
 type Tag struct {
-	gorm.Model
+	BaseModel
 	Name string `json:"name"`
 
 	Content []Content `json:"contents" gorm:"many2many:content_tags"`

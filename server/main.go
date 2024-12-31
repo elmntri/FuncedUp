@@ -2,6 +2,7 @@ package main
 
 import (
 	"funcedup/internal/schema"
+	"funcedup/internal/seeder"
 	"funcedup/pkg/config"
 	"funcedup/pkg/logger"
 	"funcedup/pkg/pgconn"
@@ -26,7 +27,7 @@ func main() {
 		pgconn.InjectModule("database"),
 		server.InjectModule("server"),
 		//* Domains ---------------------------------------------------------------
-
+		seeder.InjectDomain("seeder"),
 		//* Migration -------------------------------------------------------------
 		fx.Invoke(func(m *pgconn.Module) {
 			m.ApplySchema(
