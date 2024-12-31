@@ -25,14 +25,14 @@ type User struct {
 	// DiscusionReplies []DiscusionReply `json:"discusionReplies" gorm:"foreignKey:OwnerID"` // all replies the user has made
 	// Notes            []Note           `json:"notes" gorm:"foreignKey:OwnerID"`            // all notes the user owns
 	// NoteReplies      []NoteReply      `json:"noteReplies" gorm:"foreignKey:OwnerID"`      // all replies the user has made
-	// Content []Content `json:"posts" gorm:"foreignKey:OwnerID"`
+	// Content 			[]Content 		 `json:"posts" gorm:"foreignKey:OwnerID"`
 }
 
 type Discussion struct {
 	BaseModel
 
-	OwnerID   uint `json:"ownerId"`
-	ContentID uint `json:"contentId"`
+	OwnerID   uuid.UUID `json:"ownerId"`
+	ContentID uuid.UUID `json:"contentId"`
 
 	// Owner   *User            `json:"owner" gorm:"foreignKey:OwnerID"`
 	// Content *Content         `json:"content" gorm:"foreignKey:ContentID"`
@@ -42,9 +42,9 @@ type Discussion struct {
 type DiscusionReply struct {
 	BaseModel
 
-	OwnerID      uint `json:"ownerId"`
-	DiscussionID uint `json:"discussionId"`
-	ContentID    uint `json:"contentId"`
+	OwnerID      uuid.UUID `json:"ownerId"`
+	DiscussionID uuid.UUID `json:"discussionId"`
+	ContentID    uuid.UUID `json:"contentId"`
 
 	// Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
 	// Discussion   *Discussion `json:"discussion" gorm:"foreignKey:DiscussionID"`
@@ -54,8 +54,8 @@ type DiscusionReply struct {
 type Note struct {
 	BaseModel
 
-	OwnerID   uint `json:"ownerId"`
-	ContentID uint `json:"contentId"`
+	OwnerID   uuid.UUID `json:"ownerId"`
+	ContentID uuid.UUID `json:"contentId"`
 
 	// Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
 	// Content   *Content `json:"content" gorm:"foreignKey:ContentID"`
@@ -65,9 +65,9 @@ type Note struct {
 type NoteReply struct {
 	BaseModel
 
-	OwnerID   uint `json:"ownerId"`
-	NoteID    uint `json:"noteId"`
-	ContentID uint `json:"contentId"`
+	OwnerID   uuid.UUID `json:"ownerId"`
+	NoteID    uuid.UUID `json:"noteId"`
+	ContentID uuid.UUID `json:"contentId"`
 
 	// Owner   *User `json:"owner" gorm:"foreignKey:OwnerID"`
 	// Note   *Note `json:"note" gorm:"foreignKey:NoteID"`
@@ -77,9 +77,9 @@ type NoteReply struct {
 type Content struct {
 	BaseModel
 
-	Title   string `json:"title"`
-	Body    string `json:"body"`
-	OwnerID uint   `json:"ownerId"`
+	Title   string    `json:"title"`
+	Body    string    `json:"body"`
+	OwnerID uuid.UUID `json:"ownerId"`
 
 	// optional
 	// Owner          *User            `json:"owner" gorm:"foreignKey:OwnerID"`
@@ -93,9 +93,9 @@ type Content struct {
 
 type ContentTag struct {
 	BaseModel
-	ContentID    uint   `json:"contentId"`
-	TagID        uint   `json:"tagId"`
-	Relationship string `json:"relationship"` // potentially use enums for relationships
+	ContentID    uuid.UUID `json:"contentId"`
+	TagID        uuid.UUID `json:"tagId"`
+	Relationship string    `json:"relationship"` // potentially use enums for relationships
 }
 
 type Tag struct {

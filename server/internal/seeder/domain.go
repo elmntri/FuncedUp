@@ -83,7 +83,7 @@ func (d *Domain) onStart(ctx context.Context) error {
 	// init data here
 
 	d.logger.Info("Seeding test data.")
-	d.seedUsers()
+	d.SeedAll()
 
 	return nil
 }
